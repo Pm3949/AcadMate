@@ -4,27 +4,53 @@ import jwt from "jsonwebtoken";
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, confirmPassword, collegeName, branch, program } = req.body;
-    if (!name || !email || !password || !confirmPassword || !collegeName || !branch || !program) {
-      return res.status(400).json({ message: "All fields are required" });
+    const {
+      name,
+      email,
+      password,
+      confirmPassword,
+      collegeName,
+      branch,
+      program,
+    } = req.body;
+
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !confirmPassword ||
+      !collegeName ||
+      !branch ||
+      !program
+    ) {
+      return res
+        .status(400)
+        .json({ message: "All fields are required", success: false });
     }
+
     if (password !== confirmPassword) {
-      return res.status(400).json({ message: "Passwords do not match" });
+      return res
+        .status(400)
+        .json({ message: "Passwords do not match", success: false });
     }
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ message: "User already exists" });
-    }
+
+    // Normalize email to lowercase
+    const emailNormalized = email.toLowerCase();
+
     const hashedPassword = await bcrypt.hash(password, 12);
+    //profilePic
+
     await User.create({
       name,
       email,
       password: hashedPassword,
       collegeName,
       branch,
-      program
+      program,
     });
-    return res.status(201).json({ message: "User created successfully", success: true });
+    return res
+      .status(201)
+      .json({ message: "User created successfully", success: true });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
@@ -41,16 +67,30 @@ export const loginUser = async (req, res) => {
     if (!existingUser) {
       return res.status(400).json({ message: "User does not exist" });
     }
-    const isPasswordCorrect = await bcrypt.compare(password, existingUser.password);
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
     if (!isPasswordCorrect) {
-      return res.status(400).json({ message: "Invalid credentials", success: false });
+      return res
+        .status(400)
+        .json({ message: "Invalid credentials", success: false });
     }
     const tokenData = {
       id: existingUser._id,
-      email: existingUser.email
+      email: existingUser.email,
+      name: existingUser.name,
+       collegeName: existingUser.collegeName,
+      branch: existingUser.branch,
+      program: existingUser.program,
     };
-    const token = await jwt.sign(tokenData, process.env.SESSION_SECRET, { expiresIn: "1h" });
-    return res.status(200)
+
+    const token = await jwt.sign(tokenData, process.env.SESSION_SECRET, {
+      expiresIn: "1h",
+    });
+
+    return res
+      .status(200)
       .cookie("token", token, {
         httpOnly: true,
         maxAge: 1 * 60 * 60 * 1000,
@@ -63,9 +103,6 @@ export const loginUser = async (req, res) => {
         _id: existingUser._id,
         name: existingUser.name,
         email: existingUser.email,
-        collegeName: existingUser.collegeName,
-        branch: existingUser.branch,
-        program: existingUser.program
       });
   } catch (error) {
     console.error(error);
@@ -90,7 +127,7 @@ export const logoutUser = async (req, res) => {
 
 export const getMyProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id)// Exclude password
+    const user = await User.findById(req.user.id); // Exclude password
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -101,3 +138,14 @@ export const getMyProfile = async (req, res) => {
   }
 };
 
+export const getStudyMaterials = async (req, res) => {
+  try {
+    const branches = await Branch.find();
+    res.json({ success: true, branches });
+  } catch (error) {
+    console.error("Fetch error:", error.message);
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to fetch study materials" });
+  }
+};
