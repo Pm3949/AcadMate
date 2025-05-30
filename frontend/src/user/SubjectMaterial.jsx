@@ -27,7 +27,7 @@ function SubjectMaterialPage() {
     const fetchMaterials = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/materials/${category}/${branchName}/${subjectName}/files`
+          `https://acadmate-backend.onrender.com/api/materials/${category}/${branchName}/${subjectName}/files`
         );
         if (!res.ok) throw new Error("Failed to fetch materials");
         const data = await res.json();
@@ -56,7 +56,7 @@ function SubjectMaterialPage() {
   const token = useSelector((state) => state.auth.authUser?.token);
   const handleSave = async (fileId) => {
     try {
-      const res = await fetch("http://localhost:5000/api/materials/save", {
+      const res = await fetch("https://acadmate-backend.onrender.com/api/materials/save", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -192,7 +192,7 @@ function SubjectMaterialPage() {
 
                     <div className="flex flex-wrap gap-3">
                       <a
-                        href={`http://localhost:5000/api/materials/view/${material.fileSlug}`}
+                        href={`https://acadmate-backend.onrender.com/api/materials/view/${material.fileSlug}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm py-1.5 px-3 rounded-full font-medium transition-colors duration-300"
@@ -203,7 +203,7 @@ function SubjectMaterialPage() {
 
                       {material.downloadUrl && (
                         <a
-                          href={`http://localhost:5000/api/materials/download/${material.fileSlug}`}
+                          href={`https://acadmate-backend.onrender.com/api/materials/download/${material.fileSlug}`}
                           className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-medium py-2 px-4 rounded-full transition-colors duration-300"
                         >
                           <DownloadIcon className="w-4 h-4" />
