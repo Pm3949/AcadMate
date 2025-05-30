@@ -27,16 +27,16 @@
 git clone https://github.com/yourusername/acadmate.git
 cd acadmate
 
-# Install server dependencies
-cd server
+# Install backend dependencies
+cd sbackend
 npm install
 
-# Install client dependencies
-cd ../client
+# Install frontend dependencies
+cd ../frontend
 npm install
 
-# Run both servers (use concurrently or separate terminals)
-npm run dev
+# Run both frontend and backend (use concurrently or separate terminals)
+npm run start
 ```
 ---
 
