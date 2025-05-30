@@ -72,27 +72,33 @@ export const viewFileBySlug = async (req, res) => {
   try {
     const { fileSlug } = req.params;
 
-    const materials = await StudyMaterial.find().lean();
+    const materials = await StudyMaterial.find({}, 'branches.subjects.files').lean();
 
     let targetFile = null;
 
     for (const category of materials) {
       for (const branch of category.branches) {
         for (const subject of branch.subjects) {
-          const found = subject.files.find((f) => f.fileSlug === fileSlug);
-          if (found) {
-            targetFile = found;
-            break;
-          }
+          targetFile = subject.files.find((f) => f.fileSlug === fileSlug);
+          if (targetFile) break;
         }
         if (targetFile) break;
       }
       if (targetFile) break;
     }
 
-    if (!targetFile) return res.status(404).json({ message: "File not found" });
+    if (!targetFile) {
+      return res.status(404).json({ message: "File not found" });
+    }
 
-    const decryptedUrl = decrypt(targetFile.webUrl);
+    let decryptedUrl;
+    try {
+      decryptedUrl = decrypt(targetFile.webUrl);
+    } catch (decryptErr) {
+      console.error("Decryption error:", decryptErr.message);
+      return res.status(400).json({ message: "Invalid file URL" });
+    }
+
     return res.redirect(decryptedUrl);
   } catch (error) {
     console.error("Error redirecting to file:", error.message);
@@ -101,6 +107,7 @@ export const viewFileBySlug = async (req, res) => {
       .json({ message: "Internal server error during file access" });
   }
 };
+
 
 // GET /api/materials/download/:fileSlug
 export const downloadFileBySlug = async (req, res) => {
