@@ -5,7 +5,6 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import session from 'express-session';
-import MongoStore from "connect-mongo";
 import cookieParser from "cookie-parser";
 
 
@@ -36,21 +35,11 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-      mongoUrl: process.env.MONGO_URI,
-    }),
-    cookie: {
-      secure: true, // Important for HTTPS on Render
-      sameSite: "none", // Allow cross-origin session (important if admin panel is on a different domain)
-      httpOnly: true,
-    },
-  })
-);
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+}));
 
 // Routes
 app.get('/', (req, res) => {
