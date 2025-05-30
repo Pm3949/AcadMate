@@ -236,13 +236,9 @@ const AdminUpload = () => {
   const [pdfFiles, setPdfFiles] = useState([]);
   const [branch, setBranch] = useState("");
   const [subject, setSubject] = useState("");
-  const [typeofmaterial, settypeofmaterial] = useState("");
+  const [materialType, setMaterialType] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [materialType, setMaterialType] = useState({
-    studyMaterial: false,
-    previousYearPaper: false,
-  });
 
   const handleFileChange = (e) => {
     setPdfFiles([...e.target.files]);
@@ -265,7 +261,7 @@ const AdminUpload = () => {
     setMessage("");
 
     const formData = new FormData();
-    formData.append("category", typeofmaterial);
+     formData.append("category", materialType);
     formData.append("branch", branch);
     formData.append("subject", subject);
     pdfFiles.forEach((file) => formData.append("files", file));
@@ -311,8 +307,8 @@ const AdminUpload = () => {
         </h2>
         <form onSubmit={handleUpload} className="flex flex-col space-y-4">
           <select
-            value={typeofmaterial}
-            onChange={(e) => settypeofmaterial(e.target.value)}
+            value={materialType}
+            onChange={(e) => setMaterialType(e.target.value)}
             className={`border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
           >
             <option value="">Select Type of Material</option>
@@ -323,9 +319,9 @@ const AdminUpload = () => {
           <select
             value={branch}
             onChange={handleBranchChange}
-            disabled={!typeofmaterial}
+            disabled={!materialType}
             className={`border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              !typeofmaterial ? "bg-gray-100 cursor-not-allowed" : ""
+              !materialType ? "bg-gray-100 cursor-not-allowed" : ""
             }`}
           >
             <option value="">Select Branch</option>
@@ -340,7 +336,7 @@ const AdminUpload = () => {
             onChange={(e) => setSubject(e.target.value)}
             disabled={!branch}
             className={`border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500
-              ${!typeofmaterial ? "bg-gray-100 cursor-not-allowed" : ""}`}
+              ${!materialType ? "bg-gray-100 cursor-not-allowed" : ""}`}
           >
             <option value="">Select Subject</option>
             {branch &&
