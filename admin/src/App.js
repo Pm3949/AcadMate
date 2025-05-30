@@ -7,7 +7,7 @@ function App() {
   return (
     <div className="App">
       <Routes>
-     <Route path="/admin/upload" element={<AdminUpload />} />
+     <Route path="/" element={<AdminUpload />} />
      </Routes>
     </div>
   );
