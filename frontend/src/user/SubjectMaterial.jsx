@@ -192,7 +192,7 @@ function SubjectMaterialPage() {
 
                     <div className="flex flex-wrap gap-3">
                       <a
-                        href={`https://acadmate-backend.onrender.com/api/materials/view/${material.fileSlug}`}
+                        href={`${material.webUrl}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm py-1.5 px-3 rounded-full font-medium transition-colors duration-300"
