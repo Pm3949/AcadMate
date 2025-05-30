@@ -114,6 +114,7 @@ export const viewFileBySlug = async (req, res) => {
 };
 
 
+
 // GET /api/materials/download/:fileSlug
 export const downloadFileBySlug = async (req, res) => {
   try {
