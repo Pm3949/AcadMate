@@ -35,11 +35,21 @@ app.use(cors({
 }));
 
 app.use(express.json());
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGODB_URI,
+    }),
+    cookie: {
+      secure: true, // Important for HTTPS on Render
+      sameSite: "none", // Allow cross-origin session (important if admin panel is on a different domain)
+      httpOnly: true,
+    },
+  })
+);
 
 // Routes
 app.get('/', (req, res) => {
