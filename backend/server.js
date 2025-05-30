@@ -21,7 +21,7 @@ const port = process.env.PORT || 5000;
 connectDB();
 
 // Middleware
-const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
+const allowedOrigins = ['https://acadmate-vx8s.onrender.com', 'http://localhost:3001'];
 app.use(cookieParser());
 app.use(cors({
   origin: function (origin, callback) {
