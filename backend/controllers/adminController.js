@@ -58,40 +58,32 @@ export const oneDriveCallback = async (req, res) => {
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
 
-  req.session.accessToken = response.data.access_token;
-req.session.refreshToken = response.data.refresh_token;
-delete req.session.pkceVerifier;
+    req.session.accessToken = response.data.access_token;
+    req.session.refreshToken = response.data.refresh_token;
+    delete req.session.pkceVerifier;
 
-// 🔐 Ensure session is saved before redirecting
-req.session.save((err) => {
-  if (err) {
-    console.error("Session save error:", err);
-    return res.status(500).send("Session saving failed");
-  }
-  res.redirect("https://acadmate-admin.onrender.com");
-});
-
+    res.redirect("https://acadmate-admin.onrender.com");
   } catch (error) {
     console.error("Token error:", error.response?.data || error.message);
     res.status(500).send("Authentication failed");
   }
 };
 
+
 export const uploadMultiplePDFs = async (req, res) => {
   const accessToken = req.session.accessToken;
-  const { typeofmaterial, branch, subject } = req.body;
-  console.log(req.body);
+  const { category, branch, subject } = req.body;
 
   if (!accessToken) {
-    return res.status(401).json({ error: "Not authorized with OneDrive" });
+    return res.status(401).json({ error: 'Not authorized with OneDrive' });
   }
 
-  if (!typeofmaterial || !branch || !subject) {
-    return res.status(400).json({ error: "Missing required fields" });
+  if (!category || !branch || !subject) {
+    return res.status(400).json({ error: 'Missing required fields' });
   }
 
   if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ error: "No files uploaded" });
+    return res.status(400).json({ error: 'No files uploaded' });
   }
 
   const uploadedFiles = [];
@@ -100,7 +92,7 @@ export const uploadMultiplePDFs = async (req, res) => {
   for (const file of req.files) {
     const filePath = path.resolve(file.path);
     const fileName = file.originalname;
-    const uploadPath = `Study_Mine_material/${typeofmaterial}/${branch}/${subject}/${fileName}`;
+    const uploadPath = `Study_Mine_material/${category}/${branch}/${subject}/${fileName}`;
     const stream = fs.createReadStream(filePath);
 
     try {
@@ -110,7 +102,7 @@ export const uploadMultiplePDFs = async (req, res) => {
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
-            "Content-Type": "application/pdf",
+            'Content-Type': 'application/pdf',
           },
         }
       );
@@ -118,11 +110,11 @@ export const uploadMultiplePDFs = async (req, res) => {
       const encryptedUrl = encrypt(response.data.webUrl);
       const fileSlug = nanoid();
 
-      let typeofmaterialDoc = await StudyMaterial.findOne({ typeofmaterial });
+      let categoryDoc = await StudyMaterial.findOne({ category });
 
-      if (!typeofmaterialDoc) {
-        typeofmaterialDoc = await StudyMaterial.create({
-          typeofmaterial,
+      if (!categoryDoc) {
+        categoryDoc = await StudyMaterial.create({
+          category,
           branches: [
             {
               branch,
@@ -143,9 +135,9 @@ export const uploadMultiplePDFs = async (req, res) => {
           ],
         });
       } else {
-        let branchDoc = typeofmaterialDoc.branches.find((b) => b.branch === branch);
+        let branchDoc = categoryDoc.branches.find((b) => b.branch === branch);
         if (!branchDoc) {
-          typeofmaterialDoc.branches.push({
+          categoryDoc.branches.push({
             branch,
             subjects: [
               {
@@ -162,9 +154,7 @@ export const uploadMultiplePDFs = async (req, res) => {
             ],
           });
         } else {
-          let subjectDoc = branchDoc.subjects.find(
-            (s) => s.subject === subject
-          );
+          let subjectDoc = branchDoc.subjects.find((s) => s.subject === subject);
           if (!subjectDoc) {
             branchDoc.subjects.push({
               subject,
@@ -186,13 +176,12 @@ export const uploadMultiplePDFs = async (req, res) => {
             });
           }
         }
-        await typeofmaterialDoc.save();
+        await categoryDoc.save();
       }
 
       uploadedFiles.push({ fileName, webUrl: encryptedUrl });
     } catch (err) {
-      const errorMessage =
-        err.response?.data?.error?.message || err.message || "Unknown error";
+      const errorMessage = err.response?.data?.error?.message || err.message || 'Unknown error';
       console.error(`Upload failed for ${fileName}:`, errorMessage);
       failedFiles.push({ fileName, error: errorMessage });
     } finally {
@@ -209,12 +198,11 @@ export const uploadMultiplePDFs = async (req, res) => {
   } else {
     res.status(500).json({
       success: false,
-      error: "All uploads failed",
+      error: 'All uploads failed',
       failed: failedFiles,
     });
   }
 };
-
 export const sharePDF = async (req, res) => {
   const { fileId } = req.params;
   const { accessToken } = req.session;
