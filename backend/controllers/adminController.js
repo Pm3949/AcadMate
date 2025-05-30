@@ -58,11 +58,19 @@ export const oneDriveCallback = async (req, res) => {
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
 
-    req.session.accessToken = response.data.access_token;
-    req.session.refreshToken = response.data.refresh_token;
-    delete req.session.pkceVerifier;
+  req.session.accessToken = response.data.access_token;
+req.session.refreshToken = response.data.refresh_token;
+delete req.session.pkceVerifier;
 
-    res.redirect("http://localhost:3001/admin/upload");
+// 🔐 Ensure session is saved before redirecting
+req.session.save((err) => {
+  if (err) {
+    console.error("Session save error:", err);
+    return res.status(500).send("Session saving failed");
+  }
+  res.redirect("https://acadmate-admin.onrender.com");
+});
+
   } catch (error) {
     console.error("Token error:", error.response?.data || error.message);
     res.status(500).send("Authentication failed");

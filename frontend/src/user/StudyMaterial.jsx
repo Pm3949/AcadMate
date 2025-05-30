@@ -41,7 +41,7 @@ function StudyMaterial() {
       try {
         console.log("Fetching branches from API...");
         const response = await fetch(
-          `http://localhost:5000/api/materials/${encodeURIComponent(
+          `https://acadmate-backend.onrender.com/api/materials/${encodeURIComponent(
             decodedCategory
           )}/branches`
         );

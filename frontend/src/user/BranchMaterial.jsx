@@ -24,7 +24,7 @@ function BranchMaterialPage() {
     const fetchSubjects = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/materials/${category}/${branchName}/subjects`
+          `https://acadmate-backend.onrender.com/api/materials/${category}/${branchName}/subjects`
         );
         if (!res.ok) throw new Error("Failed to fetch subjects");
         const data = await res.json();
