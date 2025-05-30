@@ -62,7 +62,7 @@ export const oneDriveCallback = async (req, res) => {
     req.session.refreshToken = response.data.refresh_token;
     delete req.session.pkceVerifier;
 
-    res.redirect("http://localhost:3001/admin/upload");
+    res.redirect("https://acadmate-admin.onrender.com/admin/upload");
   } catch (error) {
     console.error("Token error:", error.response?.data || error.message);
     res.status(500).send("Authentication failed");
