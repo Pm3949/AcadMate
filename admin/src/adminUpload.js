@@ -233,6 +233,16 @@ const branchSubjectMap = {
 };
 
 const AdminUpload = () => {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("accessToken");
+
+    if (token) {
+      localStorage.setItem("accessToken", token);
+      // Optional: clean up URL
+      window.history.replaceState({}, document.title, "/");
+    }
+  }, []);
   const [pdfFiles, setPdfFiles] = useState([]);
   const [branch, setBranch] = useState("");
   const [subject, setSubject] = useState("");
@@ -267,12 +277,16 @@ const AdminUpload = () => {
     pdfFiles.forEach((file) => formData.append("files", file));
 
     try {
+        const token = localStorage.getItem("accessToken");
       const response = await axios.post(
         "https://acadmate-backend.onrender.com/api/admin/upload",
         formData,
         {
           withCredentials: true,
-          headers: { "Content-Type": "multipart/form-data" },
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
