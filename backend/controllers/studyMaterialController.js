@@ -99,6 +99,11 @@ export const viewFileBySlug = async (req, res) => {
       return res.status(400).json({ message: "Invalid file URL" });
     }
 
+    if (!/^https?:\/\//i.test(decryptedUrl)) {
+      console.error("Invalid redirect URL format:", decryptedUrl);
+      return res.status(400).json({ message: "Decrypted URL is not valid" });
+    }
+
     return res.redirect(decryptedUrl);
   } catch (error) {
     console.error("Error redirecting to file:", error.message);
