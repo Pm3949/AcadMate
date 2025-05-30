@@ -45,7 +45,7 @@ const Login = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        "http://localhost:5000/api/users/login",
+        "https://acadmate-backend.onrender.com/api/users/login",
         formData,
         {
           headers: { "Content-Type": "application/json" },
