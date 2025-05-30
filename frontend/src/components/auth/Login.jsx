@@ -17,7 +17,9 @@ const Login = () => {
   // Dark mode initialization
   useEffect(() => {
     const savedMode = localStorage.getItem("darkMode");
-    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const systemPrefersDark = window.matchMedia(
+      "(prefers-color-scheme: dark)"
+    ).matches;
 
     if (savedMode === "true" || (!savedMode && systemPrefersDark)) {
       setDarkMode(true);
@@ -42,7 +44,14 @@ const Login = () => {
 
     try {
       setLoading(true);
-      const response = await axios.post("http://localhost:5000/api/users/login", formData);
+      const response = await axios.post(
+        "http://localhost:5000/api/users/login",
+        formData,
+        {
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true, // Ensures cookies (for session-based auth)
+        }
+      );
 
       if (response.data.success) {
         dispatch(
@@ -53,7 +62,8 @@ const Login = () => {
             token: response.data.token,
           })
         );
-        navigate("/materials");
+        localStorage.setItem("token", response.data.token);
+        navigate("/materials/categories");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
@@ -113,7 +123,10 @@ const Login = () => {
 
         <p className="text-center text-gray-600 dark:text-gray-300">
           Don't have an account?{" "}
-          <Link to="/signup" className="text-indigo-600 hover:underline dark:text-indigo-400">
+          <Link
+            to="/signup"
+            className="text-indigo-600 hover:underline dark:text-indigo-400"
+          >
             Sign up
           </Link>
         </p>

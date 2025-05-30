@@ -10,7 +10,7 @@ import EnhancedBookLoader from "../components/BookLoader";
 import { motion, AnimatePresence } from "framer-motion";
 
 function BranchMaterialPage() {
-  const { branchName } = useParams();
+  const { category,branchName } = useParams();
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,7 +24,7 @@ function BranchMaterialPage() {
     const fetchSubjects = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/materials/${branchName}`
+          `http://localhost:5000/api/materials/${category}/${branchName}/subjects`
         );
         if (!res.ok) throw new Error("Failed to fetch subjects");
         const data = await res.json();
@@ -81,7 +81,7 @@ function BranchMaterialPage() {
           className="flex items-center gap-2 text-blue-700 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 transition mb-8 group"
         >
           <ArrowLeftIcon className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-          <span className="font-medium">Back to Branches</span>
+          <span className="font-medium">Back to All Branches</span>
         </motion.button>
 
         <motion.div
@@ -138,7 +138,7 @@ function BranchMaterialPage() {
                   }`}
                   onClick={() =>
                     navigate(
-                      `/materials/branch/${branchName}/subject/${subject}`
+                      `/materials/${category}/${branchName}/${subject}`
                     )
                   }
                 >

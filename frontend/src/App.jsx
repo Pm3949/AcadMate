@@ -5,8 +5,13 @@ import Login from "./components/auth/Login.jsx";
 import Signup from "./components/auth/Signup.jsx";
 import StudyMaterial from "./user/StudyMaterial.jsx";
 import Navbar from "./components/Navbar.jsx";
+import Footer from "./components/footer.jsx";
 import BranchMaterialPage from "./user/BranchMaterial.jsx";
 import SubjectMaterialPage from "./user/SubjectMaterial.jsx";
+import MaterialCategoriesPage from "./user/categoryMaterial.jsx";
+import ProtectedRoute from "./components/protectRoute.jsx";
+import Profile from "./user/profile.jsx";
+import Games from "./user/games.jsx";
 
 function App() {
   return (
@@ -16,19 +21,28 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/games" element={<Games />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/materials" element={<StudyMaterial />} />
-          <Route
-            path="/materials/branch/:branchName"
-            element={<BranchMaterialPage />}
-          />
-          <Route
-            path="/materials/branch/:branchName/subject/:subjectName"
-            element={<SubjectMaterialPage />}
-          />
-          <Route path="*" element={<Navigate to="/materials" replace />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/profile" element={<Profile />} />
+            <Route
+              path="/materials/categories"
+              element={<MaterialCategoriesPage />}
+            />
+            <Route path="/materials/:category" element={<StudyMaterial />} />
+            <Route
+              path="/materials/:category/:branchName"
+              element={<BranchMaterialPage />}
+            />
+            <Route
+              path="/materials/:category/:branchName/:subjectName"
+              element={<SubjectMaterialPage />}
+            />
+            <Route path="*" element={<Navigate to="/materials" replace />} />
+          </Route>
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }

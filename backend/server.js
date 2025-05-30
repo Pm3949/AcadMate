@@ -5,6 +5,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import session from 'express-session';
+import cookieParser from "cookie-parser";
+
 
 import connectDB from './db.js';
 import adminRoutes from './routes/adminRoutes.js';
@@ -20,7 +22,7 @@ connectDB();
 
 // Middleware
 const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
-
+app.use(cookieParser());
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin || allowedOrigins.includes(origin)) {

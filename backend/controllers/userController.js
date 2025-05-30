@@ -125,9 +125,9 @@ export const logoutUser = async (req, res) => {
   }
 };
 
-export const getMyProfile = async (req, res) => {
+export const getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id); // Exclude password
+    const user = await User.findById(req.user.id).select('-password');// Exclude password
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -138,14 +138,3 @@ export const getMyProfile = async (req, res) => {
   }
 };
 
-export const getStudyMaterials = async (req, res) => {
-  try {
-    const branches = await Branch.find();
-    res.json({ success: true, branches });
-  } catch (error) {
-    console.error("Fetch error:", error.message);
-    res
-      .status(500)
-      .json({ success: false, error: "Failed to fetch study materials" });
-  }
-};

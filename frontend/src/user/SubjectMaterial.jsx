@@ -9,9 +9,11 @@ import {
 } from "lucide-react";
 import EnhancedBookLoader from "../components/BookLoader";
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 function SubjectMaterialPage() {
-  const { branchName, subjectName } = useParams();
+  const { category, branchName, subjectName } = useParams();
   const [materials, setMaterials] = useState([]);
   const [filteredMaterials, setFilteredMaterials] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -19,13 +21,13 @@ function SubjectMaterialPage() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const [hoveredIndex, setHoveredIndex] = useState(null);
-
+  const [savedIds, setSavedIds] = useState([]);
 
   useEffect(() => {
     const fetchMaterials = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/materials/${branchName}/${subjectName}`
+          `http://localhost:5000/api/materials/${category}/${branchName}/${subjectName}/files`
         );
         if (!res.ok) throw new Error("Failed to fetch materials");
         const data = await res.json();
@@ -50,6 +52,30 @@ function SubjectMaterialPage() {
     );
     setFilteredMaterials(filtered);
   }, [searchTerm, materials]);
+
+  const token = useSelector((state) => state.auth.authUser?.token);
+  const handleSave = async (fileId) => {
+    try {
+      const res = await fetch("http://localhost:5000/api/materials/save", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ fileId }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to save");
+      }
+
+      toast.success("Material saved successfully!");
+    } catch (err) {
+      toast.error(err.message || "Failed to save material");
+    }
+  };
 
   if (loading)
     return (
@@ -169,7 +195,7 @@ function SubjectMaterialPage() {
                         href={`http://localhost:5000/api/materials/view/${material.fileSlug}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm py-1.5 px-3 rounded-full transition-colors duration-300"
+                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm py-1.5 px-3 rounded-full font-medium transition-colors duration-300"
                       >
                         <ExternalLinkIcon className="w-4 h-4" />
                         View & Download Material
@@ -183,6 +209,20 @@ function SubjectMaterialPage() {
                           <DownloadIcon className="w-4 h-4" />
                           Download
                         </a>
+                      )}
+                      {material._id && (
+                        <button
+                          onClick={() => handleSave(material._id)}
+                          disabled={savedIds.includes(material._id)}
+                          className={`flex items-center gap-2 ${
+                            savedIds.includes(material._id)
+                              ? "bg-gray-400 cursor-not-allowed"
+                              : "bg-green-600 hover:bg-green-800"
+                          } text-white font-medium py-2 px-4 rounded-full transition-colors duration-300`}
+                        >
+                          💾{" "}
+                          {savedIds.includes(material._id) ? "Saved" : "Save"}
+                        </button>
                       )}
                     </div>
                   </div>

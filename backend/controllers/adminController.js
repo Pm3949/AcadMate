@@ -1,7 +1,7 @@
 import fs from "fs";
 import axios from "axios";
 import path from "path";
-import Branch from "../models/studyMaterial.js";
+import StudyMaterial from "../models/Material.js";
 import { encrypt } from "../utils/encryption.js";
 import { customAlphabet } from "nanoid";
 const nanoid = customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789", 10);
@@ -10,8 +10,7 @@ const fileSlug = nanoid(); // Example: 'k7g8z1qw'
 let access_token = null; // Store securely in DB or session in real apps
 import crypto from "crypto";
 
-// Generate PKCE code verifier and challenge
-const generatePkceCodes = () => {
+export const loginWithOneDrive = (req, res) => {
   const verifier = crypto.randomBytes(32).toString("hex");
   const challenge = crypto
     .createHash("sha256")
@@ -20,13 +19,7 @@ const generatePkceCodes = () => {
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");
-  return { verifier, challenge };
-};
 
-export const loginWithOneDrive = (req, res) => {
-  const { verifier, challenge } = generatePkceCodes();
-
-  // Store verifier in session (needed later for token redemption)
   req.session.pkceVerifier = verifier;
 
   const redirectUrl =
@@ -56,7 +49,7 @@ export const oneDriveCallback = async (req, res) => {
       code,
       redirect_uri: process.env.ONEDRIVE_REDIRECT_URI,
       grant_type: "authorization_code",
-      code_verifier: pkceVerifier, // Critical for PKCE
+      code_verifier: pkceVerifier,
     });
 
     const response = await axios.post(
@@ -65,10 +58,9 @@ export const oneDriveCallback = async (req, res) => {
       { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
     );
 
-    // Store tokens securely
     req.session.accessToken = response.data.access_token;
     req.session.refreshToken = response.data.refresh_token;
-    delete req.session.pkceVerifier; // Clear after use
+    delete req.session.pkceVerifier;
 
     res.redirect("http://localhost:3001/admin/upload");
   } catch (error) {
@@ -79,15 +71,15 @@ export const oneDriveCallback = async (req, res) => {
 
 export const uploadMultiplePDFs = async (req, res) => {
   const accessToken = req.session.accessToken;
+  const { typeofmaterial, branch, subject } = req.body;
+  console.log(req.body);
 
   if (!accessToken) {
     return res.status(401).json({ error: "Not authorized with OneDrive" });
   }
 
-  const { branch, subject } = req.body;
-
-  if (!branch || !subject) {
-    return res.status(400).json({ error: "Branch and subject are required" });
+  if (!typeofmaterial || !branch || !subject) {
+    return res.status(400).json({ error: "Missing required fields" });
   }
 
   if (!req.files || req.files.length === 0) {
@@ -100,7 +92,7 @@ export const uploadMultiplePDFs = async (req, res) => {
   for (const file of req.files) {
     const filePath = path.resolve(file.path);
     const fileName = file.originalname;
-    const uploadPath = `Study_Mine_material/${branch}/${subject}/${fileName}`;
+    const uploadPath = `Study_Mine_material/${typeofmaterial}/${branch}/${subject}/${fileName}`;
     const stream = fs.createReadStream(filePath);
 
     try {
@@ -118,12 +110,34 @@ export const uploadMultiplePDFs = async (req, res) => {
       const encryptedUrl = encrypt(response.data.webUrl);
       const fileSlug = nanoid();
 
-      try {
-        let branchDoc = await Branch.findOne({ branch });
+      let typeofmaterialDoc = await StudyMaterial.findOne({ typeofmaterial });
 
+      if (!typeofmaterialDoc) {
+        typeofmaterialDoc = await StudyMaterial.create({
+          typeofmaterial,
+          branches: [
+            {
+              branch,
+              subjects: [
+                {
+                  subject,
+                  files: [
+                    {
+                      fileName,
+                      oneDriveId: response.data.id,
+                      webUrl: encryptedUrl,
+                      fileSlug,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        });
+      } else {
+        let branchDoc = typeofmaterialDoc.branches.find((b) => b.branch === branch);
         if (!branchDoc) {
-          // Case 1: Branch doesn't exist
-          branchDoc = await Branch.create({
+          typeofmaterialDoc.branches.push({
             branch,
             subjects: [
               {
@@ -140,12 +154,10 @@ export const uploadMultiplePDFs = async (req, res) => {
             ],
           });
         } else {
-          const subjectIndex = branchDoc.subjects.findIndex(
-            (sub) => sub.subject === subject
+          let subjectDoc = branchDoc.subjects.find(
+            (s) => s.subject === subject
           );
-
-          if (subjectIndex === -1) {
-            // Case 2: Subject doesn't exist
+          if (!subjectDoc) {
             branchDoc.subjects.push({
               subject,
               files: [
@@ -158,26 +170,18 @@ export const uploadMultiplePDFs = async (req, res) => {
               ],
             });
           } else {
-            // Case 3: Both branch and subject exist
-            branchDoc.subjects[subjectIndex].files.push({
+            subjectDoc.files.push({
               fileName,
               oneDriveId: response.data.id,
               webUrl: encryptedUrl,
               fileSlug,
             });
           }
-
-          await branchDoc.save();
         }
-
-        uploadedFiles.push({ fileName, webUrl: encryptedUrl });
-      } catch (mongoErr) {
-        console.error(
-          `MongoDB update failed for ${fileName}:`,
-          mongoErr.message
-        );
-        failedFiles.push({ fileName, error: mongoErr.message });
+        await typeofmaterialDoc.save();
       }
+
+      uploadedFiles.push({ fileName, webUrl: encryptedUrl });
     } catch (err) {
       const errorMessage =
         err.response?.data?.error?.message || err.message || "Unknown error";
@@ -208,34 +212,32 @@ export const sharePDF = async (req, res) => {
   const { accessToken } = req.session;
 
   if (!accessToken) {
-    return res.status(401).json({ error: 'Not authenticated' });
+    return res.status(401).json({ error: "Not authenticated" });
   }
 
   try {
-    // 1. Generate a public view link
     const shareResponse = await axios.post(
       `https://graph.microsoft.com/v1.0/me/drive/items/${fileId}/createLink`,
       {
-        type: 'view', // Must be "view"
-        scope: 'anonymous', // Must be "anonymous"
+        type: "view",
+        scope: "anonymous",
       },
       {
         headers: {
           Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       }
     );
 
     const webUrl = shareResponse.data.link.webUrl;
-
-    // 2. Encode the share URL for Office Viewer
-    const officeEmbedUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(webUrl)}`;
+    const officeEmbedUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+      webUrl
+    )}`;
 
     res.json({ shareUrl: officeEmbedUrl });
-
   } catch (err) {
-    console.error('Share error:', err.response?.data || err.message);
-    res.status(500).json({ error: 'Sharing failed' });
+    console.error("Share error:", err.response?.data || err.message);
+    res.status(500).json({ error: "Sharing failed" });
   }
 };

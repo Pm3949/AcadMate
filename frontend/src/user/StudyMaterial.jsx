@@ -1,12 +1,17 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useParams,useNavigate } from "react-router-dom";
 import EnhancedBookLoader from "../components/BookLoader";
+import { ArrowLeftIcon } from "lucide-react";
+import { motion } from "framer-motion";
 
 function StudyMaterial() {
+  const { category } = useParams();
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const location = useLocation();
+  const decodedCategory = decodeURIComponent(category);
+  const navigate = useNavigate();
 
   // Debug: Log current location
   useEffect(() => {
@@ -28,13 +33,17 @@ function StudyMaterial() {
   };
 
   useEffect(() => {
+    console.log("StudyMaterial - Current location:", location.pathname);
+
     let isMounted = true;
 
     const fetchBranches = async () => {
       try {
         console.log("Fetching branches from API...");
         const response = await fetch(
-          "http://localhost:5000/api/materials/branches"
+          `http://localhost:5000/api/materials/${encodeURIComponent(
+            decodedCategory
+          )}/branches`
         );
 
         if (!response.ok)
@@ -61,7 +70,7 @@ function StudyMaterial() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [decodedCategory]);
 
   if (loading) {
     return (
@@ -91,10 +100,18 @@ function StudyMaterial() {
     <div className="min-h-screen rounded-lg bg-sky-50 dark:bg-gray-800 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
+          <motion.button
+            onClick={() => navigate(-1)}
+            whileHover={{ x: -4 }}
+            className="flex items-center gap-2 text-blue-700 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-100 transition mb-8 group"
+          >
+            <ArrowLeftIcon className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <span className="font-medium">Back to Categories</span>
+          </motion.button>
           <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
             Engineering Branches
           </h1>
-         <p className="text-lg text-gray-600 dark:text-gray-300">
+          <p className="text-lg text-gray-600 dark:text-gray-300">
             Select a branch to explore study materials
           </p>
         </div>
@@ -103,10 +120,10 @@ function StudyMaterial() {
           {branches.map((branch, index) => (
             <div
               key={branch._id || `branch-${index}`}
-              className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col relative"
+              className="bg-white dark:bg-sky-100 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col relative"
             >
               {/* Branch Image */}
-              <div className="w-full h-48 overflow-hidden flex items-center justify-center bg-gray-200">
+              <div className="w-full h-48 overflow-hidden flex items-center justify-center bg-gray-00">
                 <img
                   src={
                     branchImages[branch.branch] ||
@@ -122,11 +139,13 @@ function StudyMaterial() {
               </div>
 
               {/* Bottom Section */}
-              <div className="p-4 flex items-center justify-between mt-auto border-t border-gray-100">
+              <div className="p-4 flex items-center justify-between  mt-auto border-t border-gray-100"> 
                 {/* Use Link instead of button with navigate */}
                 <Link
-                  to={`/materials/branch/${encodeURIComponent(branch.branch)}`}
-                  className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors duration-200 flex items-center justify-center"
+                  to={`/materials/${encodeURIComponent(
+                    decodedCategory
+                  )}/${encodeURIComponent(branch.branch)}`}
+                  className="p-2 rounded-full bg-blue-200 text-blue-600 hover:bg-blue-200 transition-colors duration-200 flex items-center justify-center"
                   aria-label={`View ${branch.branch} materials`}
                   onClick={() =>
                     console.log("Link clicked for:", branch.branch)

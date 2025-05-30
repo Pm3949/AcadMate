@@ -236,6 +236,7 @@ const AdminUpload = () => {
   const [pdfFiles, setPdfFiles] = useState([]);
   const [branch, setBranch] = useState("");
   const [subject, setSubject] = useState("");
+  const [typeofmaterial, settypeofmaterial] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [materialType, setMaterialType] = useState({
@@ -260,25 +261,22 @@ const AdminUpload = () => {
       return;
     }
 
+    setLoading(true);
+    setMessage("");
+
     const formData = new FormData();
-    pdfFiles.forEach((file) => {
-      formData.append("files", file);
-    });
-    formData.append("branch", branch.trim());
-    formData.append("subject", subject.trim());
-    formData.append("studyMaterial", materialType.studyMaterial);
-    formData.append("previousYearPaper", materialType.previousYearPaper);
+    formData.append("category", typeofmaterial);
+    formData.append("branch", branch);
+    formData.append("subject", subject);
+    pdfFiles.forEach((file) => formData.append("files", file));
 
     try {
-      setLoading(true);
-      setMessage("");
-
       const response = await axios.post(
         "http://localhost:5000/api/admin/upload",
         formData,
         {
-          headers: { "Content-Type": "multipart/form-data" },
           withCredentials: true,
+          headers: { "Content-Type": "multipart/form-data" },
         }
       );
 
@@ -312,46 +310,22 @@ const AdminUpload = () => {
           📤 Upload PDFs to StudyMine
         </h2>
         <form onSubmit={handleUpload} className="flex flex-col space-y-4">
-          <div className="flex flex-col space-y-2">
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={materialType.studyMaterial}
-                onChange={() =>
-                  setMaterialType({
-                    studyMaterial: true,
-                    previousYearPaper: false,
-                  })
-                }
-                className="form-checkbox h-4 w-4 text-blue-600"
-              />
-              <span className="text-sm text-gray-700">Study Material</span>
-            </label>
-            <label className="flex items-center space-x-2">
-              <input
-                type="checkbox"
-                checked={materialType.previousYearPaper}
-                onChange={() =>
-                  setMaterialType({
-                    studyMaterial: false,
-                    previousYearPaper: true,
-                  })
-                }
-                className="form-checkbox h-4 w-4 text-blue-600"
-              />
-              <span className="text-sm text-gray-700">Previous Year Paper</span>
-            </label>
-          </div>
+          <select
+            value={typeofmaterial}
+            onChange={(e) => settypeofmaterial(e.target.value)}
+            className={`border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
+          >
+            <option value="">Select Type of Material</option>
+            <option>Study Material</option>
+            <option>Previous Year Paper</option>
+          </select>
+
           <select
             value={branch}
             onChange={handleBranchChange}
-            disabled={
-              !materialType.studyMaterial && !materialType.previousYearPaper
-            }
+            disabled={!typeofmaterial}
             className={`border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-              !materialType.studyMaterial && !materialType.previousYearPaper
-                ? "bg-gray-100 cursor-not-allowed"
-                : ""
+              !typeofmaterial ? "bg-gray-100 cursor-not-allowed" : ""
             }`}
           >
             <option value="">Select Branch</option>
@@ -365,7 +339,8 @@ const AdminUpload = () => {
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
             disabled={!branch}
-            className="border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className={`border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500
+              ${!typeofmaterial ? "bg-gray-100 cursor-not-allowed" : ""}`}
           >
             <option value="">Select Subject</option>
             {branch &&
@@ -377,7 +352,7 @@ const AdminUpload = () => {
           </select>
           <input
             type="file"
-             accept=".pdf,.ppt,.pptx,.doc,.docx,.jpg,.png,.jpeg"
+            accept=".pdf,.ppt,.pptx,.doc,.docx,.jpg,.png,.jpeg"
             multiple
             onChange={handleFileChange}
             className="border border-gray-300 px-4 py-2 rounded-lg"

@@ -1,6 +1,12 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcrypt';
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
+const fileSchema = new mongoose.Schema({
+  fileName: String,
+  oneDriveId: String,
+  webUrl: String,
+  fileSlug: String,
+});
 const UserSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -28,8 +34,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  files: [fileSchema],
 });
 
-
-
-export default mongoose.model('User', UserSchema);
+export default mongoose.model("User", UserSchema);

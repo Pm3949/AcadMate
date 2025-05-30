@@ -1,18 +1,23 @@
-import express from 'express';
+import express from "express";
 import {
-  getAllBranches,
-  getSubjectsByBranch,
+  getAllCategories,
+  getBranchesByCategory,
   getFilesBySubject,
+  getSubjectsByBranch,
   viewFileBySlug,
-  downloadFileBySlug
-} from '../controllers/materialController.js';
+  downloadFileBySlug,
+  saveFile,
+} from "../controllers/studyMaterialController.js";
+import isAuthenticated from "../middleware/isAuthenticated.js";
 
 const router = express.Router();
 
-router.get('/branches', getAllBranches);
-router.get('/view/:fileSlug', viewFileBySlug); 
-router.get('/download/:fileSlug', downloadFileBySlug);
-router.get('/:branch', getSubjectsByBranch);
-router.get('/:branch/:subject', getFilesBySubject);
+router.get("/categories", getAllCategories);
+router.get("/:category/branches", getBranchesByCategory);
+router.get("/:category/:branch/subjects", getSubjectsByBranch);
+router.get("/:category/:branch/:subject/files", getFilesBySubject);
+router.get("/view/:fileSlug", viewFileBySlug);
+router.get("/download/:fileSlug", downloadFileBySlug);
+router.post("/save",isAuthenticated, saveFile);
 
 export default router;
