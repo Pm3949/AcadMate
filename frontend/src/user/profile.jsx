@@ -71,7 +71,7 @@ function Profile() {
                   {file.fileName}
                 </div>
                 <a
-                  href={`https://acadmate-backend.onrender.com/api/materials/view/${file.fileSlug}`}
+                  href={`${file.webUrl}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition"
