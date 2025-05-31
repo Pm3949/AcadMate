@@ -152,7 +152,7 @@ const Navbar = () => {
                   to="/signup"
                   className="px-4 py-2 rounded-md text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 shadow-sm transition-all duration-300"
                 >
-                  Register
+                  SignUp
                 </Link>
               </div>
             )}
