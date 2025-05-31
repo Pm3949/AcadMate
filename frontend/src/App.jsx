@@ -12,6 +12,7 @@ import MaterialCategoriesPage from "./user/categoryMaterial.jsx";
 import ProtectedRoute from "./components/protectRoute.jsx";
 import Profile from "./user/profile.jsx";
 import Games from "./user/games.jsx";
+import HomePage from "./homePage.jsx";
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/games" element={<Games />} />
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<HomePage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/profile" element={<Profile />} />
             <Route
@@ -38,7 +39,6 @@ function App() {
               path="/materials/:category/:branchName/:subjectName"
               element={<SubjectMaterialPage />}
             />
-            <Route path="*" element={<Navigate to="/materials" replace />} />
           </Route>
         </Routes>
       </main>
