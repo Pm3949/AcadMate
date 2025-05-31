@@ -3,11 +3,20 @@ import { toast } from 'react-toastify';
 import { ExternalLinkIcon } from 'lucide-react';
 
 function Profile() {
- const token = useSelector((state) => state.auth.authUser?.token);
+ const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchProfile = async () => {
+    const token = localStorage.getItem('token'); // Get token from local storage
+    
+    if (!token) {
+      toast.error('No token found');
+      setLoading(false);
+      return;
+    }
+
     try {
-      const res = await fetch('http://localhost:5000/api/users/me', {
+      const res = await fetch('https://acadmate-backend.onrender.com/api/users/me', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -26,13 +35,8 @@ function Profile() {
   };
 
   useEffect(() => {
-    if (token) {
-      fetchProfile();
-    } else {
-      toast.error('No token found');
-      setLoading(false);
-    }
-  }, [token]);
+    fetchProfile();
+  }, []); // Empty dependency array since we're not using Redux token anymore
 
   if (loading) {
     return <EnhancedBookLoader/>
