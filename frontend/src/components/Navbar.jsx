@@ -71,38 +71,7 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-6">
-            {user ? (
-              <Link
-                to="/materials/Previous%20Year%20Paper"
-                className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 relative group"
-              >
-                Previous Year Papers
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 dark:bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            ) : (
-              <button
-                onClick={() => toast.warn("Please login to access this page")}
-                className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 relative group"
-              >
-                Previous Year Papers
-              </button>
-            )}
-            {user ? (
-              <Link
-                to="/materials/Study%20Material"
-                className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 relative group"
-              >
-                Study Resources
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 dark:bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
-              </Link>
-            ) : (
-              <button
-                onClick={() => toast.warn("Please login to access this page")}
-                className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 relative group"
-              >
-                Study Resources
-              </button>
-            )}
+            
             <Link
               to="/games"
               className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 relative group"
@@ -194,38 +163,7 @@ const Navbar = () => {
         } md:hidden bg-white dark:bg-gray-900 transition-all duration-300`}
       >
         <div className="px-2 pt-2 pb-4 space-y-2">
-          {user ? (
-            <Link
-              to="/materials/Previous%20Year%20Paper"
-              className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 relative group"
-            >
-              Previous Year Papers
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 dark:bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-          ) : (
-            <button
-              onClick={() => toast.warn("Please login to access this page")}
-              className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 relative group"
-            >
-              Previous Year Papers
-            </button>
-          )}
-          {user ? (
-            <Link
-              to="/materials/Study%20Material"
-              className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 relative group"
-            >
-              Study Resources
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 dark:bg-blue-400 transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-          ) : (
-            <button
-              onClick={() => toast.warn("Please login to access this page")}
-              className="px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 relative group"
-            >
-              Study Resources
-            </button>
-          )}
+          
           <Link
             to="/games"
             onClick={() => setMobileMenuOpen(false)}
