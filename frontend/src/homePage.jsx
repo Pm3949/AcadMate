@@ -67,12 +67,7 @@ export default function HomePage() {
         >
           {isLoggedIn ? (
             <>
-              <Link to="/profile">
-                <button className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-full transition">
-                  Go to Dashboard
-                </button>
-              </Link>
-              <Link to="/study-materials">
+              <Link to="/materials/categories">
                 <button className="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white font-semibold px-6 py-2 rounded-full transition">
                   Check Resources
                 </button>
