@@ -62,6 +62,7 @@ const Login = () => {
             token: response.data.token,
           })
         );
+        localStorage.setItem("token", response.data.token);
         navigate("/materials/categories");
       }
     } catch (err) {
