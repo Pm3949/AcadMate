@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ExternalLinkIcon } from 'lucide-react';
 import EnhancedBookLoader from '../components/BookLoader';
+import axios from "axios";
+
 
 function Profile() {
  const [profile, setProfile] = useState(null);
