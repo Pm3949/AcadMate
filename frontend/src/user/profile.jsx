@@ -7,33 +7,34 @@ function Profile() {
  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async () => {
-    const token = localStorage.getItem('token'); // Get token from local storage
-    
-    if (!token) {
-      toast.error('No token found');
-      setLoading(false);
-      return;
-    }
+ const fetchProfile = async () => {
+  const token = localStorage.getItem('token');
 
-    try {
-      const res = await fetch('https://acadmate-backend.onrender.com/api/users/me', {
+  if (!token) {
+    toast.error('No token found');
+    setLoading(false);
+    return;
+  }
+
+  try {
+    const res = await axios.get(
+      'https://acadmate-backend.onrender.com/api/users/me',
+      {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      });
+      }
+    );
 
-      if (!res.ok) throw new Error('Unauthorized');
-
-      const data = await res.json();
-      setProfile(data.user);
-      setLoading(false);
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to load profile');
-      setLoading(false);
-    }
-  };
+    // Axios auto-parses JSON into `res.data`
+    setProfile(res.data.user);
+    setLoading(false);
+  } catch (err) {
+    console.error(err);
+    toast.error('Failed to load profile');
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchProfile();
