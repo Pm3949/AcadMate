@@ -204,37 +204,37 @@ export const uploadMultiplePDFs = async (req, res) => {
     });
   }
 };
-export const sharePDF = async (req, res) => {
-  const { fileId } = req.params;
-  const { accessToken } = req.session;
+// export const sharePDF = async (req, res) => {
+//   const { fileId } = req.params;
+//   const { accessToken } = req.session;
 
-  if (!accessToken) {
-    return res.status(401).json({ error: "Not authenticated" });
-  }
+//   if (!accessToken) {
+//     return res.status(401).json({ error: "Not authenticated" });
+//   }
 
-  try {
-    const shareResponse = await axios.post(
-      `https://graph.microsoft.com/v1.0/me/drive/items/${fileId}/createLink`,
-      {
-        type: "view",
-        scope: "anonymous",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
+//   try {
+//     const shareResponse = await axios.post(
+//       `https://graph.microsoft.com/v1.0/me/drive/items/${fileId}/createLink`,
+//       {
+//         type: "view",
+//         scope: "anonymous",
+//       },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${accessToken}`,
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
 
-    const webUrl = shareResponse.data.link.webUrl;
-    const officeEmbedUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
-      webUrl
-    )}`;
+//     const webUrl = shareResponse.data.link.webUrl;
+//     const officeEmbedUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(
+//       webUrl
+//     )}`;
 
-    res.json({ shareUrl: officeEmbedUrl });
-  } catch (err) {
-    console.error("Share error:", err.response?.data || err.message);
-    res.status(500).json({ error: "Sharing failed" });
-  }
-};
+//     res.json({ shareUrl: officeEmbedUrl });
+//   } catch (err) {
+//     console.error("Share error:", err.response?.data || err.message);
+//     res.status(500).json({ error: "Sharing failed" });
+//   }
+// };
