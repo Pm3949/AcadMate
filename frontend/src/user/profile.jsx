@@ -18,10 +18,13 @@ function Profile() {
     }
 
     try {
+      // Set the token as a cookie manually before making the request
+      document.cookie = `token=${token}; path=/; SameSite=None; Secure`;
+      
       const res = await axios.get(
         'https://acadmate-backend.onrender.com/api/users/me',
         {
-          withCredentials: true, // This ensures cookies are sent automatically
+          withCredentials: true,
         }
       );
 
