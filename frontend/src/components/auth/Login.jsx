@@ -38,6 +38,13 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Helper function to set cookie
+  const setCookie = (name, value, days) => {
+    const expires = new Date();
+    expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -62,7 +69,11 @@ const Login = () => {
             token: response.data.token,
           })
         );
+        
+        // Store token in localStorage AND set as cookie
         localStorage.setItem("token", response.data.token);
+        setCookie("token", response.data.token, 7); // Set cookie for 7 days
+        
         navigate("/materials/categories");
       }
     } catch (err) {
