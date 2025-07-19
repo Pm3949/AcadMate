@@ -38,11 +38,11 @@ const Login = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Helper function to set cookie
+  // Helper function to set cookie with cross-origin support
   const setCookie = (name, value, days) => {
     const expires = new Date();
     expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
-    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=Strict`;
+    document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/;SameSite=None;Secure`;
   };
 
   const handleSubmit = async (e) => {
