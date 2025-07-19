@@ -4,39 +4,39 @@ import { ExternalLinkIcon } from 'lucide-react';
 import EnhancedBookLoader from '../components/BookLoader';
 import axios from "axios";
 
+
 function Profile() {
-  const [profile, setProfile] = useState(null);
+ const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async () => {
-    const token = localStorage.getItem('token');
+ const fetchProfile = async () => {
+  const token = localStorage.getItem('token');
 
-    if (!token) {
-      toast.error('No token found');
-      setLoading(false);
-      return;
-    }
+  if (!token) {
+    toast.error('No token found');
+    setLoading(false);
+    return;
+  }
 
-    try {
-      // Set the token as a cookie manually before making the request
-      document.cookie = `token=${token}; path=/; SameSite=None; Secure`;
-      
-      const res = await axios.get(
-        'https://acadmate-backend.onrender.com/api/users/me',
-        {
-          withCredentials: true,
-        }
-      );
+  try {
+    const res = await axios.get(
+      'https://acadmate-backend.onrender.com/api/users/me',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
 
-      // Axios auto-parses JSON into `res.data`
-      setProfile(res.data.user);
-      setLoading(false);
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to load profile');
-      setLoading(false);
-    }
-  };
+    // Axios auto-parses JSON into `res.data`
+    setProfile(res.data.user);
+    setLoading(false);
+  } catch (err) {
+    console.error(err);
+    toast.error('Failed to load profile');
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchProfile();
