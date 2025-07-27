@@ -21,7 +21,7 @@ function StudyMaterial() {
     const fetchBranches = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/materials/${encodeURIComponent(decodedCategory)}/branches`
+          `https://acadmate-backend.onrender.com/api/materials/${encodeURIComponent(decodedCategory)}/branches`
         );
 
         if (!response.ok) {

@@ -10,7 +10,7 @@ function Profile() {
 
   const fetchProfile = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/users/me', {
+      const res = await axios.get('https://acadmate-backend.onrender.com/api/users/me', {
         withCredentials: true, // ✅ Send cookies
       });
 

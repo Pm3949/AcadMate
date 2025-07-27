@@ -50,8 +50,8 @@ const Signup = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        // 'https://acadmate-backend.onrender.com/api/users/register', 
-        'http://localhost:5000/api/users/register',
+        'https://acadmate-backend.onrender.com/api/users/register', 
+        // 'http://localhost:5000/api/users/register',
         formData);
       if (response.data.success) {
         navigate('/login');

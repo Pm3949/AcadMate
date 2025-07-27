@@ -208,8 +208,8 @@ function SubjectMaterialPage() {
                       {material.downloadUrl && (
                         <a
                           href={
-                            // `https://acadmate-backend.onrender.com/api/materials/download/${material.fileSlug}`
-                            `http://localhost:5000/api/materials/download/${material.fileSlug}`
+                            `https://acadmate-backend.onrender.com/api/materials/download/${material.fileSlug}`
+                            // `http://localhost:5000/api/materials/download/${material.fileSlug}`
                         }
                           className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-medium py-2 px-4 rounded-full transition-colors duration-300"
                         >
