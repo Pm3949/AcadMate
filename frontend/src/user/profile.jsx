@@ -8,20 +8,27 @@ function Profile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async () => {
-    try {
-      const res = await axios.get('https://acadmate-backend.onrender.com/api/users/me', {
-        withCredentials: true, // ✅ Send cookies
-      });
-
-      setProfile(res.data.user);
-    } catch (err) {
-      // console.error(err);
-      toast.error('Failed to load profile');
-    } finally {
-      setLoading(false);
+const fetchProfile = async () => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast.error('Token missing');
+      return;
     }
-  };
+
+    const res = await axios.get('https://acadmate-backend.onrender.com/api/users/me', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    setProfile(res.data.user);
+  } catch (err) {
+    toast.error('Failed to load profile');
+  } finally {
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     fetchProfile();
