@@ -27,8 +27,8 @@ function SubjectMaterialPage() {
     const fetchMaterials = async () => {
       try {
         const res = await fetch(
-          `http://localhost:5000/api/materials/${category}/${branchName}/${subjectName}/files`
-          // `https://acadmate-backend.onrender.com/api/materials/${category}/${branchName}/${subjectName}/files`
+          // `http://localhost:5000/api/materials/${category}/${branchName}/${subjectName}/files`
+          `https://acadmate-backend.onrender.com/api/materials/${category}/${branchName}/${subjectName}/files`
         );
         if (!res.ok) throw new Error("Failed to fetch materials");
         const data = await res.json();
@@ -58,8 +58,8 @@ function SubjectMaterialPage() {
   const handleSave = async (fileId) => {
     try {
       const res = await fetch(
-        // "https://acadmate-backend.onrender.com/api/materials/save", 
-        "http://localhost:5000/api/materials/save",
+        "https://acadmate-backend.onrender.com/api/materials/save", 
+        // "http://localhost:5000/api/materials/save",
         {
         method: "POST",
         headers: {
