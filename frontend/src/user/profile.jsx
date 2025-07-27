@@ -2,52 +2,39 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { ExternalLinkIcon } from 'lucide-react';
 import EnhancedBookLoader from '../components/BookLoader';
-import axios from "axios";
-
+import axios from 'axios';
 
 function Profile() {
- const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
- const fetchProfile = async () => {
-  const token = localStorage.getItem('token');
+  const fetchProfile = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/users/me', {
+        withCredentials: true, // ✅ Send cookies
+      });
 
-  if (!token) {
-    toast.error('No token found');
-    setLoading(false);
-    return;
-  }
-
-  try {
-    const res = await axios.get(
-      'https://acadmate-backend.onrender.com/api/users/me',
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    // Axios auto-parses JSON into `res.data`
-    setProfile(res.data.user);
-    setLoading(false);
-  } catch (err) {
-    console.error(err);
-    toast.error('Failed to load profile');
-    setLoading(false);
-  }
-};
+      setProfile(res.data.user);
+    } catch (err) {
+      // console.error(err);
+      toast.error('Failed to load profile');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchProfile();
-  }, []); // Empty dependency array since we're not using Redux token anymore
+  }, []);
 
-  if (loading) {
-    return <EnhancedBookLoader/>
-  }
-  if (!profile) {
-    return <div className="text-center mt-10 text-red-500">Failed to load profile</div>;
-  }
+  if (loading) return <EnhancedBookLoader />;
+
+  if (!profile)
+    return (
+      <div className="text-center mt-10 text-red-500">
+        Failed to load profile
+      </div>
+    );
 
   return (
     <div className="p-6 max-w-xl mx-auto bg-white dark:bg-gray-900 rounded-xl shadow-md mt-10">

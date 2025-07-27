@@ -95,18 +95,18 @@ export const viewFileBySlug = async (req, res) => {
     try {
       decryptedUrl = decrypt(targetFile.webUrl);
     } catch (decryptErr) {
-      console.error("Decryption error:", decryptErr.message);
+      // console.error("Decryption error:", decryptErr.message);
       return res.status(400).json({ message: "Invalid file URL" });
     }
 
     if (!/^https?:\/\//i.test(decryptedUrl)) {
-      console.error("Invalid redirect URL format:", decryptedUrl);
+      // console.error("Invalid redirect URL format:", decryptedUrl);
       return res.status(400).json({ message: "Decrypted URL is not valid" });
     }
 
     return res.redirect(decryptedUrl);
   } catch (error) {
-    console.error("Error redirecting to file:", error.message);
+    // console.error("Error redirecting to file:", error.message);
     return res
       .status(500)
       .json({ message: "Internal server error during file access" });
@@ -143,7 +143,7 @@ export const downloadFileBySlug = async (req, res) => {
     const decryptedUrl = decrypt(targetFile.webUrl);
     return res.redirect(`${decryptedUrl}?download=1`);
   } catch (error) {
-    console.error("Error redirecting to download:", error.message);
+    // console.error("Error redirecting to download:", error.message);
     return res
       .status(500)
       .json({ message: "Internal server error during download" });
@@ -207,7 +207,7 @@ export const saveFile = async (req, res) => {
 
     res.status(200).json({ message: "File saved to profile" });
   } catch (err) {
-    console.error("Save error:", err);
+    // console.error("Save error:", err);
     res.status(500).json({ message: "Internal server error" });
   }
 };

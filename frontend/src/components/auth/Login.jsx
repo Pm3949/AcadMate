@@ -45,7 +45,8 @@ const Login = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        "https://acadmate-backend.onrender.com/api/users/login",
+        // "https://acadmate-backend.onrender.com/api/users/login",
+        "http://localhost:5000/api/users/login",
         formData,
         {
           headers: { "Content-Type": "application/json" },
@@ -74,13 +75,6 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <button
-        onClick={toggleDarkMode}
-        className="absolute top-4 right-4 p-2 rounded-full text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
-        aria-label="Toggle Dark Mode"
-      >
-        {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-      </button>
 
       <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md transition-colors duration-300">
         <h2 className="text-3xl font-extrabold text-center text-gray-900 dark:text-white">

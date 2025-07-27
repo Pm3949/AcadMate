@@ -13,7 +13,7 @@ const isAuthenticated = async (req, res, next) => {
     req.user = { id: decoded.id };
     next();
   } catch (error) {
-    console.error("JWT Authentication Error:", error);
+    // console.error("JWT Authentication Error:", error);
     return res.status(401).json({ message: "Unauthorized - Token error" });
   }
 };

@@ -65,7 +65,7 @@ export const oneDriveCallback = async (req, res) => {
 res.redirect(`https://acadmate-admin.onrender.com?accessToken=${response.data.access_token}`);
 
   } catch (error) {
-    console.error("Token error:", error.response?.data || error.message);
+    // console.error("Token error:", error.response?.data || error.message);
     res.status(500).send("Authentication failed");
   }
 };
@@ -183,7 +183,7 @@ export const uploadMultiplePDFs = async (req, res) => {
       uploadedFiles.push({ fileName, webUrl: encryptedUrl });
     } catch (err) {
       const errorMessage = err.response?.data?.error?.message || err.message || 'Unknown error';
-      console.error(`Upload failed for ${fileName}:`, errorMessage);
+      // console.error(`Upload failed for ${fileName}:`, errorMessage);
       failedFiles.push({ fileName, error: errorMessage });
     } finally {
       fs.unlinkSync(filePath);
@@ -234,7 +234,7 @@ export const sharePDF = async (req, res) => {
 
     res.json({ shareUrl: officeEmbedUrl });
   } catch (err) {
-    console.error("Share error:", err.response?.data || err.message);
+    // console.error("Share error:", err.response?.data || err.message);
     res.status(500).json({ error: "Sharing failed" });
   }
 };

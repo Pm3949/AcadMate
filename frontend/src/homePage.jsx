@@ -23,22 +23,22 @@ export default function HomePage() {
     localStorage.setItem("darkMode", darkMode);
   }, [darkMode]);
 
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
+  // const toggleDarkMode = () => {
+  //   setDarkMode(!darkMode);
+  // };
 
   return (
     <div className="min-h-screen bg-sky-100 rounded-xl dark:bg-[#0d1117] text-gray-900 dark:text-white flex flex-col justify-between px-4 transition-colors duration-300">
       <MouseGlow darkMode={darkMode} />
       
       {/* Dark mode toggle button */}
-      <button
+      {/* <button
         onClick={toggleDarkMode}
         className="absolute top-4 right-4 p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
         aria-label="Toggle dark mode"
       >
         {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-      </button>
+      </button> */}
 
       {/* Hero Section */}
       <div className="text-center py-24 sm:py-32">

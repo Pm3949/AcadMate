@@ -13,7 +13,8 @@ const MaterialCategoriesPage = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
-          "https://acadmate-backend.onrender.com/api/materials/categories"
+          // "https://acadmate-backend.onrender.com/api/materials/categories"
+          `http://localhost:5000/api/materials/categories`
         );
 
         if (isMounted) {
@@ -21,7 +22,7 @@ const MaterialCategoriesPage = () => {
           setLoading(false);
         }
       } catch (err) {
-        console.error("Error fetching categories:", err);
+        // console.error("Error fetching categories:", err);
         if (isMounted) {
           setError(err.message);
           setLoading(false);
