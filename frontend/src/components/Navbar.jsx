@@ -52,7 +52,7 @@ const Navbar = () => {
               src={darkMode ? logoDark : logoLight}
               alt="AcadMate"
               className="h-10 w-auto transition-all duration-300 group-hover:scale-105"
-              style={{ height: "70px" }}
+              style={{ height: "50px" }}
             />
             <span className="ml-3 text-xl font-semibold text-gray-800 dark:text-white">
               AcadMate
