@@ -9,7 +9,7 @@ const Signup = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    collegeName: '',
+    collegeName: 'IIT (ISM) Dhanbad',
     branch: '',
     program: ''
   });
@@ -50,9 +50,9 @@ const Signup = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        'https://acadmate-backend.onrender.com/api/users/register', 
-        // 'http://localhost:5000/api/users/register',
-        formData);
+        'https://acadmate-backend.onrender.com/api/users/register',
+        formData
+      );
       if (response.data.success) {
         navigate('/login');
       }
@@ -65,7 +65,6 @@ const Signup = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-
       <div className="max-w-md w-full space-y-8 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-md">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
@@ -80,65 +79,74 @@ const Signup = () => {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             {[
-  { name: "name", type: "text", placeholder: "Full Name" },
-  { name: "email", type: "email", placeholder: "Email address" },
-  { name: "password", type: "password", placeholder: "Password" },
-  { name: "confirmPassword", type: "password", placeholder: "Confirm Password" },
-  { name: "collegeName", type: "text", placeholder: "College Name" }
-].map(({ name, type, placeholder }) => (
-  <div key={name}>
-    <input
-      name={name}
-      type={type}
-      required
-      disabled={name === "collegeName"}
-      value={name === "collegeName" ? "IIT (ISM) Dhanbad" : formData[name]}
-      onChange={handleChange}
-      className={`appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm ${
-        name === "collegeName" ? "cursor-not-allowed bg-gray-100 dark:bg-gray-800" : ""
-      }`}
-      placeholder={placeholder}
-    />
-  </div>
-))}
+              { name: "name", type: "text", placeholder: "Full Name" },
+              { name: "email", type: "email", placeholder: "Email address" },
+              { name: "password", type: "password", placeholder: "Password" },
+              { name: "confirmPassword", type: "password", placeholder: "Confirm Password" }
+            ].map(({ name, type, placeholder }) => (
+              <div key={name}>
+                <input
+                  name={name}
+                  type={type}
+                  required
+                  value={formData[name]}
+                  onChange={handleChange}
+                  placeholder={placeholder}
+                  className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 text-gray-900 dark:text-white bg-white dark:bg-gray-700 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                />
+              </div>
+            ))}
 
-
+            {/* College Name Select */}
             <div>
-  <select
-    name="branch"
-    required
-    className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-    value={formData.branch}
-    onChange={handleChange}
-  >
-    <option value="">Select Branch</option>
-    <option value="Chemical Engineering">Chemical Engineering</option>
-    <option value="Civil Engineering">Civil Engineering</option>
-    <option value="Computer Science and Engineering">Computer Science and Engineering</option>
-    <option value="Electrical Engineering">Electrical Engineering</option>
-    <option value="Electronics and Communication Engineering">Electronics and Communication Engineering</option>
-    <option value="Engineering Physics">Engineering Physics</option>
-    <option value="Environmental Engineering">Environmental Engineering</option>
-    <option value="Mechanical Engineering">Mechanical Engineering</option>
-    <option value="Mining Engineering">Mining Engineering</option>
-    <option value="Mining Machinery Engineering">Mining Machinery Engineering</option>
-    <option value="Mineral and Metallurgical Engineering">Mineral and Metallurgical Engineering</option>
-    <option value="Mathematics and Computing">Mathematics and Computing</option>
-    <option value="Petroleum Engineering">Petroleum Engineering</option>
-    <option value="Applied Geology">Applied Geology</option>
-    <option value="Applied Geophysics">Applied Geophysics</option>
-    <option value="Chemical Science">Chemical Science</option>
-    <option value="Physical Science">Physical Science</option>
-  </select>
-</div>
+              <select
+                name="collegeName"
+                value={formData.collegeName}
+                disabled
+                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white cursor-not-allowed focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              >
+                <option value="IIT (ISM) Dhanbad">IIT (ISM) Dhanbad</option>
+              </select>
+            </div>
 
+            {/* Branch Select */}
+            <div>
+              <select
+                name="branch"
+                required
+                value={formData.branch}
+                onChange={handleChange}
+                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+              >
+                <option value="">Select Branch</option>
+                <option value="Chemical Engineering">Chemical Engineering</option>
+                <option value="Civil Engineering">Civil Engineering</option>
+                <option value="Computer Science and Engineering">Computer Science and Engineering</option>
+                <option value="Electrical Engineering">Electrical Engineering</option>
+                <option value="Electronics and Communication Engineering">Electronics and Communication Engineering</option>
+                <option value="Engineering Physics">Engineering Physics</option>
+                <option value="Environmental Engineering">Environmental Engineering</option>
+                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                <option value="Mining Engineering">Mining Engineering</option>
+                <option value="Mining Machinery Engineering">Mining Machinery Engineering</option>
+                <option value="Mineral and Metallurgical Engineering">Mineral and Metallurgical Engineering</option>
+                <option value="Mathematics and Computing">Mathematics and Computing</option>
+                <option value="Petroleum Engineering">Petroleum Engineering</option>
+                <option value="Applied Geology">Applied Geology</option>
+                <option value="Applied Geophysics">Applied Geophysics</option>
+                <option value="Chemical Science">Chemical Science</option>
+                <option value="Physical Science">Physical Science</option>
+              </select>
+            </div>
+
+            {/* Program Select */}
             <div>
               <select
                 name="program"
                 required
-                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 value={formData.program}
                 onChange={handleChange}
+                className="appearance-none rounded relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
               >
                 <option value="">Select Program</option>
                 <option value="BTech">B.Tech</option>
@@ -157,6 +165,7 @@ const Signup = () => {
             </button>
           </div>
         </form>
+
         <div className="text-center text-gray-600 dark:text-gray-300">
           <Link
             to="/login"
