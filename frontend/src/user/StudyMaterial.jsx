@@ -1,54 +1,47 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import EnhancedBookLoader from "../components/BookLoader";
 import { ArrowLeftIcon } from "lucide-react";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 
 function StudyMaterial() {
   const { category } = useParams();
-  const [branches, setBranches] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const location = useLocation();
   const decodedCategory = decodeURIComponent(category);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    console.log("StudyMaterial - Current location:", location.pathname);
+  const fetchBranches = async () => {
+    const cachedData = sessionStorage.getItem(`branches-${decodedCategory}`);
+    if (cachedData) {
+      return JSON.parse(cachedData);
+    }
 
-    let isMounted = true;
+    const response = await fetch(
+      `https://acadmate-backend.onrender.com/api/materials/${encodeURIComponent(decodedCategory)}/branches`
+      // `http://localhost:5000/api/materials/${encodeURIComponent(decodedCategory)}/branches`
+    );
 
-    const fetchBranches = async () => {
-      try {
-        const response = await fetch(
-          `https://acadmate-backend.onrender.com/api/materials/${encodeURIComponent(decodedCategory)}/branches`
-        );
+    if (!response.ok) {
+      throw new Error("Failed to fetch branches");
+    }
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch branches: ${response.status}`);
-        }
+    const data = await response.json();
+    sessionStorage.setItem(`branches-${decodedCategory}`, JSON.stringify(data));
+    return data;
+  };
 
-        const data = await response.json();
-        if (isMounted) {
-          setBranches(data);
-          setLoading(false);
-        }
-      } catch (err) {
-        console.error("Error fetching branches:", err);
-        if (isMounted) {
-          setError(err.message);
-          setLoading(false);
-        }
-      }
-    };
+  const {
+    data: branches = [],
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["branches", decodedCategory],
+    queryFn: fetchBranches,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
-    fetchBranches();
-    return () => {
-      isMounted = false;
-    };
-  }, [decodedCategory]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div>
         <EnhancedBookLoader />
@@ -56,13 +49,13 @@ function StudyMaterial() {
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-50">
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded max-w-md">
-          <p>Error: {error}</p>
+          <p>Error: {error.message}</p>
           <button
-            onClick={() => window.location.reload()}
+            onClick={() => refetch()}
             className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
           >
             Retry
@@ -88,8 +81,9 @@ function StudyMaterial() {
             Engineering Branches
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300">
-            All study materials (CORE, OE, DE, ESO) are organized under their respective departments for easy navigation.
-            Please select your department below to access relevant files.
+            All study materials (CORE, OE, DE, ESO) are organized under their
+            respective departments for easy navigation. Please select your
+            department below to access relevant files.
           </p>
         </div>
 
@@ -99,7 +93,6 @@ function StudyMaterial() {
               key={branch._id || `branch-${index}`}
               className="bg-white dark:bg-sky-200 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col relative"
             >
-              {/* Branch Image */}
               <div className="w-full h-48 overflow-hidden flex items-center justify-center bg-gray-100">
                 <img
                   src={`/images/${branch.branch}.jpg`}
@@ -107,18 +100,16 @@ function StudyMaterial() {
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     e.target.onerror = null;
-                    e.target.src = "/images/default.jpg"; // fallback image
+                    e.target.src = "/images/default.jpg";
                   }}
                 />
               </div>
 
-              {/* Bottom Section */}
               <div className="p-4 flex items-center justify-between mt-auto">
                 <Link
                   to={`/materials/${encodeURIComponent(decodedCategory)}/${encodeURIComponent(branch.branch)}`}
                   className="p-2 rounded-full bg-blue-300 text-blue-600 hover:bg-blue-300 transition-colors duration-200 flex items-center justify-center"
                   aria-label={`View ${branch.branch} materials`}
-                  onClick={() => console.log("Link clicked for:", branch.branch)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -135,7 +126,6 @@ function StudyMaterial() {
                     />
                   </svg>
                 </Link>
-
                 <span className="text-lg font-semibold text-gray-900 ml-2">
                   {branch.branch}
                 </span>

@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   BookOpenIcon,
@@ -8,44 +7,40 @@ import {
 } from "lucide-react";
 import EnhancedBookLoader from "../components/BookLoader";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 function BranchMaterialPage() {
-  const { category,branchName } = useParams();
-  const [subjects, setSubjects] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [hoveredSubject, setHoveredSubject] = useState(null);
+  const { category, branchName } = useParams();
   const [searchQuery, setSearchQuery] = useState("");
-  const navigate = useNavigate();
+  const [hoveredSubject, setHoveredSubject] = useState(null);
   const [hoveredIndex, setHoveredIndex] = useState(null);
+  const navigate = useNavigate();
 
-
-  useEffect(() => {
-    const fetchSubjects = async () => {
-      try {
-        const res = await fetch(
-          `https://acadmate-backend.onrender.com/api/materials/${category}/${branchName}/subjects`
-          // `http://localhost:5000/api/materials/${category}/${branchName}/subjects`
-        );
-        if (!res.ok) throw new Error("Failed to fetch subjects");
-        const data = await res.json();
-        const subjectsArray = data.map((item) => item.subject);
-        setSubjects(subjectsArray);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSubjects();
-  }, [branchName]);
+  const {
+    data: subjects = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["subjects", category, branchName],
+    queryFn: async () => {
+      const res = await fetch(
+        `https://acadmate-backend.onrender.com/api/materials/${category}/${branchName}/subjects`
+        // `http://localhost:5000/api/materials/${category}/${branchName}/subjects`
+      );
+      if (!res.ok) throw new Error("Failed to fetch subjects");
+      const data = await res.json();
+      return data.map((item) => item.subject);
+    },
+    staleTime: 5 * 60 * 1000, // cache for 5 minutes
+  });
 
   const filteredSubjects = subjects.filter((subject) =>
     subject.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-sky-50 to-blue-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
         <EnhancedBookLoader />
@@ -53,7 +48,7 @@ function BranchMaterialPage() {
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-sky-50 to-blue-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
         <div className="bg-white dark:bg-gray-700 p-8 rounded-2xl shadow-lg max-w-md text-center">
@@ -61,7 +56,7 @@ function BranchMaterialPage() {
           <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">
             Error Loading Subjects
           </h3>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">{error.message}</p>
           <button
             onClick={() => window.location.reload()}
             className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-full transition-colors duration-300"
@@ -98,6 +93,7 @@ function BranchMaterialPage() {
             Explore study materials for each subject in {branchName} engineering
           </p>
         </motion.div>
+
         <div className="w-full max-w-2xl mx-auto mb-10 relative">
           <SearchIcon className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 w-5 h-5" />
           <input
@@ -114,21 +110,21 @@ function BranchMaterialPage() {
             {filteredSubjects.map((subject, index) => (
               <motion.div
                 key={subject}
-                  onMouseEnter={() => setHoveredIndex(index)}
-                  onMouseLeave={() => setHoveredIndex(null)}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                    scale:
-                      hoveredIndex === index
-                        ? 1.1
-                        : hoveredIndex === null
-                        ? 1
-                        : 0.95,
-                    zIndex: hoveredIndex === index ? 10 : 1,
-                  }}
-                  transition={{ duration: 0.1 }}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  scale:
+                    hoveredIndex === index
+                      ? 1.1
+                      : hoveredIndex === null
+                      ? 1
+                      : 0.95,
+                  zIndex: hoveredIndex === index ? 10 : 1,
+                }}
+                transition={{ duration: 0.1 }}
                 className="relative overflow-hidden"
               >
                 <div
@@ -138,9 +134,7 @@ function BranchMaterialPage() {
                       : "border-transparent"
                   }`}
                   onClick={() =>
-                    navigate(
-                      `/materials/${category}/${branchName}/${subject}`
-                    )
+                    navigate(`/materials/${category}/${branchName}/${subject}`)
                   }
                 >
                   <div className="flex justify-between items-start">
@@ -184,7 +178,7 @@ function BranchMaterialPage() {
           </AnimatePresence>
         </div>
 
-        {filteredSubjects.length === 0 && !loading && (
+        {filteredSubjects.length === 0 && !isLoading && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

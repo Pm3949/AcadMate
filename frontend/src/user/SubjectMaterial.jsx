@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   BookOpenIcon,
@@ -11,39 +10,38 @@ import EnhancedBookLoader from "../components/BookLoader";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 
 function SubjectMaterialPage() {
   const { category, branchName, subjectName } = useParams();
-  const [materials, setMaterials] = useState([]);
-  const [filteredMaterials, setFilteredMaterials] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const token = useSelector((state) => state.auth.authUser?.token);
+
+  const [searchTerm, setSearchTerm] = useState("");
   const [hoveredIndex, setHoveredIndex] = useState(null);
   const [savedIds, setSavedIds] = useState([]);
+  const [filteredMaterials, setFilteredMaterials] = useState([]);
 
-  useEffect(() => {
-    const fetchMaterials = async () => {
-      try {
-        const res = await fetch(
-          // `http://localhost:5000/api/materials/${category}/${branchName}/${subjectName}/files`
-          `https://acadmate-backend.onrender.com/api/materials/${category}/${branchName}/${subjectName}/files`
-        );
-        if (!res.ok) throw new Error("Failed to fetch materials");
-        const data = await res.json();
-        setMaterials(data);
-        setFilteredMaterials(data);
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    };
+  const {
+    data: materials = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["materials", category, branchName, subjectName],
+    queryFn: async () => {
+      const res = await fetch(
+        `https://acadmate-backend.onrender.com/api/materials/${category}/${branchName}/${subjectName}/files`
+        // `http://localhost:5000/api/materials/${category}/${branchName}/${subjectName}/files`
+      );
+      if (!res.ok) throw new Error("Failed to fetch materials");
+      return res.json();
+    },
+    staleTime: 5 * 60 * 1000,
+  });
 
-    fetchMaterials();
-  }, [branchName, subjectName]);
-
+  // Filter on search
   useEffect(() => {
     const term = searchTerm.toLowerCase();
     const filtered = materials.filter(
@@ -54,41 +52,40 @@ function SubjectMaterialPage() {
     setFilteredMaterials(filtered);
   }, [searchTerm, materials]);
 
-  const token = useSelector((state) => state.auth.authUser?.token);
   const handleSave = async (fileId) => {
     try {
       const res = await fetch(
-        "https://acadmate-backend.onrender.com/api/materials/save", 
+        "https://acadmate-backend.onrender.com/api/materials/save",
         // "http://localhost:5000/api/materials/save",
         {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ fileId }),
-      });
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ fileId }),
+        }
+      );
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || "Failed to save");
-      }
+      if (!res.ok) throw new Error(data.message || "Failed to save");
 
       toast.success("Material saved successfully!");
+      setSavedIds((prev) => [...prev, fileId]);
     } catch (err) {
       toast.error(err.message || "Failed to save material");
     }
   };
 
-  if (loading)
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-sky-50 to-blue-100 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center">
         <EnhancedBookLoader />
       </div>
     );
+  }
 
-  if (error)
+  if (isError) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-sky-50 to-blue-100 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center">
         <div className="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg max-w-md text-center">
@@ -96,7 +93,7 @@ function SubjectMaterialPage() {
           <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">
             Error Loading Materials
           </h3>
-          <p className="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">{error.message}</p>
           <button
             onClick={() => window.location.reload()}
             className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-full transition-colors duration-300"
@@ -106,11 +103,11 @@ function SubjectMaterialPage() {
         </div>
       </div>
     );
+  }
 
   return (
     <div className="min-h-screen rounded-lg bg-gradient-to-b from-sky-100 to-blue-100 dark:from-gray-900 dark:to-gray-950 p-6 pb-12">
       <div className="max-w-6xl mx-auto">
-        {/* Header with Back Button */}
         <motion.button
           onClick={() => navigate(-1)}
           whileHover={{ x: -4 }}
@@ -120,7 +117,6 @@ function SubjectMaterialPage() {
           <span className="font-medium">Back to Subjects</span>
         </motion.button>
 
-        {/* Subject Title */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -140,7 +136,6 @@ function SubjectMaterialPage() {
           </p>
         </motion.div>
 
-        {/* 🔍 Search Bar */}
         <div className="mb-8">
           <div className="relative">
             <input
@@ -154,7 +149,6 @@ function SubjectMaterialPage() {
           </div>
         </div>
 
-        {/* Materials List */}
         <div className="flex flex-col gap-6 w-full">
           <AnimatePresence>
             {filteredMaterials.length > 0 ? (
@@ -176,17 +170,15 @@ function SubjectMaterialPage() {
                     zIndex: hoveredIndex === index ? 10 : 1,
                   }}
                   transition={{ duration: 0.1 }}
-                  className="bg-white dark:bg-sky-100  rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700 transition-all duration-300 origin-center"
+                  className="bg-white dark:bg-sky-100 rounded-2xl shadow-lg overflow-hidden border border-gray-100 dark:border-gray-700 transition-all duration-300 origin-center"
                 >
                   <div className="p-4">
                     <div className="flex justify-between items-start mb-4">
                       <h3 className="text-lg font-semibold text-gray-800">
-                        {material.fileName?.split(".").slice(0, -1).join(".") ||
-                          "Untitled"}
+                        {material.fileName?.split(".").slice(0, -1).join(".") || "Untitled"}
                       </h3>
                       <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                        {material.fileName?.split(".").pop().toUpperCase() ||
-                          "FILE"}
+                        {material.fileName?.split(".").pop().toUpperCase() || "FILE"}
                       </span>
                     </div>
 
@@ -196,7 +188,7 @@ function SubjectMaterialPage() {
 
                     <div className="flex flex-wrap gap-3">
                       <a
-                        href={`${material.webUrl}`}
+                        href={material.webUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm py-1.5 px-3 rounded-full font-medium transition-colors duration-300"
@@ -207,30 +199,26 @@ function SubjectMaterialPage() {
 
                       {material.downloadUrl && (
                         <a
-                          href={
-                            `https://acadmate-backend.onrender.com/api/materials/download/${material.fileSlug}`
-                            // `http://localhost:5000/api/materials/download/${material.fileSlug}`
-                        }
+                          href={`https://acadmate-backend.onrender.com/api/materials/download/${material.fileSlug}`}
+                          // href={`http://localhost:5000/api/materials/download/${material.fileSlug}`}
                           className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-200 font-medium py-2 px-4 rounded-full transition-colors duration-300"
                         >
                           <DownloadIcon className="w-4 h-4" />
                           Download
                         </a>
                       )}
-                      {material._id && (
-                        <button
-                          onClick={() => handleSave(material._id)}
-                          disabled={savedIds.includes(material._id)}
-                          className={`flex items-center gap-2 ${
-                            savedIds.includes(material._id)
-                              ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-green-600 hover:bg-green-800"
-                          } text-white font-medium py-2 px-4 rounded-full transition-colors duration-300`}
-                        >
-                          💾{" "}
-                          {savedIds.includes(material._id) ? "Saved" : "Save"}
-                        </button>
-                      )}
+
+                      <button
+                        onClick={() => handleSave(material._id)}
+                        disabled={savedIds.includes(material._id)}
+                        className={`flex items-center gap-2 ${
+                          savedIds.includes(material._id)
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-green-600 hover:bg-green-800"
+                        } text-white font-medium py-2 px-4 rounded-full transition-colors duration-300`}
+                      >
+                        💾 {savedIds.includes(material._id) ? "Saved" : "Save"}
+                      </button>
                     </div>
                   </div>
                 </motion.div>

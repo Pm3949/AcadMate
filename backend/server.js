@@ -23,8 +23,9 @@ connectDB();
 // Middleware
 const allowedOrigins = [
   'https://acadmate-vx8s.onrender.com',
-  'https://acadmate-admin.onrender.com'
-  // 'http://localhost:3000',
+  'https://acadmate-admin.onrender.com',
+  'http://localhost:3000',
+  'http://localhost:3001',
 ];
 
 app.use(cookieParser());
