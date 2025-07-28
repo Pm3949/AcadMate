@@ -7,7 +7,6 @@ import {
   viewFileBySlug,
   downloadFileBySlug,
   saveFile,
-  sharePDF,
 } from "../controllers/studyMaterialController.js";
 import isAuthenticated from "../middleware/isAuthenticated.js";
 
@@ -19,7 +18,7 @@ router.get("/:category/:branch/subjects", getSubjectsByBranch);
 router.get("/:category/:branch/:subject/files", getFilesBySubject);
 router.get("/view/:fileSlug", viewFileBySlug);
 router.get("/download/:fileSlug", downloadFileBySlug);
-router.get("/sharePDF/:fileId", sharePDF);
+//router.get("/sharePDF/:fileId", sharePDF);
 router.post("/save",isAuthenticated, saveFile);
 
 export default router;
