@@ -43,7 +43,7 @@ function StudyMaterial() {
 
   if (isLoading) {
     return (
-      <div>
+      <div className="min-h-screen bg-gradient-to-b from-sky-50 to-blue-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
         <EnhancedBookLoader />
       </div>
     );
